@@ -5,6 +5,8 @@ let grades = []; //[Grade ID, Course ID, Test ID, Student ID, Grade] ex: [1, NFA
 let studentIdCounter = 1;
 let testCounter = 1;
 let gradeCounter = 1;
+
+
 function populateCoursesDropdown() {
     let coursesDropdowns = [
         document.getElementById("courses"), // Add Student Section
@@ -13,12 +15,11 @@ function populateCoursesDropdown() {
         document.getElementById("ViewcourseId") // View Grades Section
     ];
 
-    // Clear existing options in all dropdowns
     for (let i = 0; i < coursesDropdowns.length; i++) {
         coursesDropdowns[i].innerHTML = ""; 
        
     }
-    // Add options from the courses array if it exists
+ 
     if (courses.length > 0) {
         for (let i = 0; i < courses.length; i++) {
             for (let j = 0; j < coursesDropdowns.length; j++) {
@@ -28,29 +29,70 @@ function populateCoursesDropdown() {
     }
 }
 
-// Function to populate students dropdown
-function populateStudentsDropdown() {
-    let studentIdForGradeDropdown = document.getElementById("studentIdForGrade");
-    studentIdForGradeDropdown.innerHTML = ""; // Clear existing options
 
-    // Add options from the students array
+function populateStudentsDropdown() {
+    let GradeDropdown =[
+     document.getElementById("studentIdForGrade"),
+     
+     document.getElementById("Viewstudent")  
+    ] ;
+    for(let i = 0; i < GradeDropdown.length; i++){
+     GradeDropdown[i].innerHTML = "";
+    }
+   
+
     for (let i = 0; i < students.length; i++) {
-        studentIdForGradeDropdown.innerHTML += `<option value="${students[i][0]}">${students[i][0]} ${students[i][1]} ${students[i][2]}</option>`;
+        for(let j = 0 ; j< GradeDropdown.length ; j++){
+            GradeDropdown[j].innerHTML += `<option value="${students[i][0]}">${students[i][0]} ${students[i][1]} ${students[i][2]}</option>`;
+
+        }
     }
 }
 
 
 function populateTestsDropdown() {
-    let courseId = document.getElementById("courseIdForGrade").value; // Get the selected course ID
-    let testDropdown = document.getElementById("testId"); // Get the test dropdown
-    testDropdown.innerHTML = ""; // Clear existing options
+    let courseId = document.getElementById("courseIdForGrade").value; 
+    let testDropdown = document.getElementById("testId"); 
+    testDropdown.innerHTML = ""; 
 
-
+    let testDropdownView = document.getElementById("ViewtestId");
+    testDropdownView.innerHTML = "";
 
     // Iterate through tests to find those associated with the selected course
     for (let i = 0; i < tests.length; i++) {
-        if (tests[i][1] === courseId) { // Check if the test is associated with the selected course
+        if (tests[i][1] === courseId) { 
             testDropdown.innerHTML += `<option value="${tests[i][0]}">${tests[i][2]}</option>`; // Add test option (test name is at index2)
+        }
+        testDropdownView.innerHTML+=`<option value="${tests[i][0]}">${tests[i][2]}</option>`;
+    }
+}
+
+function updateViewGrade() {
+    let selectedCourseId = document.getElementById("ViewcourseId").value;
+    let viewTestDropdown = document.getElementById("ViewtestId");
+
+    viewTestDropdown.innerHTML = "";
+
+    for (let i = 0; i < tests.length; i++) {
+        if (tests[i][1] == selectedCourseId) {
+            viewTestDropdown.innerHTML += `<option value="${tests[i][0]}">${tests[i][2]}</option>`;
+        }
+    }
+}
+
+function updateViewStudent() {
+    let selectedCourseId = document.getElementById("ViewcourseId").value;
+    let viewStudentDropdown = document.getElementById("Viewstudent");
+
+    viewStudentDropdown.innerHTML = ``; 
+
+    for (let i = 0; i < students.length; i++) {
+        let studentCourses = students[i][3];
+        for (let j = 0; j < studentCourses.length; j++) {
+            if (studentCourses[j] == selectedCourseId) {
+                viewStudentDropdown.innerHTML += `<option value="${students[i][0]}">${students[i][1]} ${students[i][2]}</option>`;
+                break; 
+            }
         }
     }
 }
@@ -125,6 +167,7 @@ function addGrade(){
     let Stdgrade = document.getElementById("grade").value;
     let grade = [gradeId,courseId,testId,studentId,Stdgrade];
     grades.push(grade);
+    alert(grades);
 }
 
 
