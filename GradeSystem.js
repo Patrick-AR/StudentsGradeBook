@@ -14,12 +14,12 @@ function populateCoursesDropdown() {
         document.getElementById("courseIdForGrade"), // Add Grade Section
         document.getElementById("ViewcourseId") // View Grades Section
     ];
-
+    
     for (let i = 0; i < coursesDropdowns.length; i++) {
         coursesDropdowns[i].innerHTML = ""; 
        
     }
- 
+    document.getElementById("courseIdForGrade").innerHTML = "<option> Select a course </option>";
     if (courses.length > 0) {
         for (let i = 0; i < courses.length; i++) {
             for (let j = 0; j < coursesDropdowns.length; j++) {
@@ -33,9 +33,8 @@ function populateCoursesDropdown() {
 function populateStudentsDropdown() {
     let GradeDropdown =[
      document.getElementById("studentIdForGrade"),
-     
      document.getElementById("Viewstudent")  
-    ] ;
+    ];
     for(let i = 0; i < GradeDropdown.length; i++){
      GradeDropdown[i].innerHTML = "";
     }
@@ -83,7 +82,7 @@ function updateViewGrade() {
 function updateViewStudent() {
     let selectedCourseId = document.getElementById("ViewcourseId").value;
     let viewStudentDropdown = document.getElementById("Viewstudent");
-
+    
     viewStudentDropdown.innerHTML = ``; 
 
     for (let i = 0; i < students.length; i++) {
@@ -97,6 +96,23 @@ function updateViewStudent() {
     }
 }
 
+function updateAddGradeStudent(){
+    let SelectedCourseId = document.getElementById("courseIdForGrade").value;
+    let viewStudentDropdown = document.getElementById("studentIdForGrade");
+
+    viewStudentDropdown.innerHTML = "";
+    for(let i = 0 ; i < students.length ; i++){
+        let studentCourses = students[i][3];
+        for(let j = 0 ; j < studentCourses.length ; j++){
+            if(studentCourses[j] == SelectedCourseId){
+                viewStudentDropdown.innerHTML += `<option value="${students[i][0]}">${students[i][1]} ${students[i][2]}</option>`
+                break;
+            }
+        }
+    }
+
+
+}
 
 
 function addStudent() {
@@ -116,8 +132,9 @@ function addStudent() {
     students.push(student);
 
     document.getElementById("addStudentForm").reset();
+    document.getElementById("studentId").value = studentIdCounter;
     alert("Student Added Successfully");
-    populateStudentsDropdown(); // Update the student dropdown options
+    populateStudentsDropdown();
 
 }
 
@@ -125,15 +142,15 @@ function addCourse() {
     let courseId = document.getElementById("courseId").value;
     let courseName = document.getElementById("courseName").value;
 
-    let course = [courseId, courseName, []]; // empty array for tests
+    let course = [courseId, courseName, []]; 
     courses.push(course);
 
     document.getElementById("addCourseForm").reset();
     alert("Course Added Successfully");
-    populateCoursesDropdown(); // Update the course dropdown options
+    populateCoursesDropdown(); 
 }
 
-// Add Test Function
+
 function addTest() {
     let courseId = document.getElementById("courseIdForTest").value;
     let testName = document.getElementById("testName").value;
@@ -170,4 +187,90 @@ function addGrade(){
     alert(grades);
 }
 
+function viewGrades() {
+    let courseId = document.getElementById("ViewcourseId").value;
+    let testId = document.getElementById("ViewtestId").value;
+    let studentId = document.getElementById("Viewstudent").value;
+    let found = false;
+    
+    document.getElementById("MaxStdGrade").innerHTML = "";
+    document.getElementById("StdGrade").innerHTML = "";
+    document.getElementById("CourseAvg").innerHTML = "";
+    document.getElementById("TestAvg").innerHTML = "";
+
+    
+  
+    for (let i = 0; i < grades.length; i++) {
+        if (grades[i][3] == studentId && grades[i][2] == testId) {
+            for (let j = 0; j < tests.length; j++) {
+                if (tests[j][0] == testId) {
+                    document.getElementById("MaxStdGrade").innerHTML = tests[j][3]+'.00'; 
+                    document.getElementById("StdGrade").innerHTML = grades[i][4]; 
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                break;
+            }
+        }
+    }
+
+document.getElementById("CourseAvg").innerHTML=CalculateCourseAvarage(courseId);
+document.getElementById("TestAvg").innerHTML=calculateTestAverage(testId);
+   
+}
+
+
+function CalculateCourseAvarage(cID){
+    let courseId = cID;
+    let totalGradeSum = 0;
+    let totalMaxScoreSum = 0;
+
+    for(let i = 0 ; i < grades.length ; i++){
+        if(grades[i][1] == courseId){
+            let testId = grades[i][2];
+            let studentGrade = Number(grades[i][4]); 
+
+            for (let j = 0; j < tests.length; j++) {
+                if (tests[j][0] == testId) {
+                    let maxScore = Number(tests[j][3]); 
+                    totalGradeSum += studentGrade;
+                    totalMaxScoreSum += maxScore;
+                }
+            }
+        }
+    }
+    let courseAverage = totalMaxScoreSum > 0 ? (totalGradeSum / totalMaxScoreSum) * 100 : 0;
+    return courseAverage.toFixed(2); 
+}
+
+function calculateTestAverage(tstId) {
+    let testId = tstId;
+    let totalGradeSum = 0;
+    let studentCount = 0;
+    let maxScore = 0;
+
+    for (let i = 0; i < grades.length; i++) {
+        if (grades[i][2] == testId) { 
+            totalGradeSum += Number(grades[i][4]); 
+            studentCount++; 
+        }
+    }
+
+  
+    for (let j = 0; j < tests.length; j++) {
+        if (tests[j][0] == testId) {
+            maxScore = Number(tests[j][3]);
+            break;
+        }
+    }
+
+    let testAverage = studentCount > 0 ? totalGradeSum / studentCount : 0;
+    
+
+    let normalizedTestAverage = maxScore > 0 ? (testAverage / maxScore) * 100 : 0;
+    
+    return normalizedTestAverage.toFixed(2); 
+}
 
